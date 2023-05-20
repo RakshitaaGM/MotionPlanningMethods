@@ -9,9 +9,9 @@ float Astar::calculateHeuristics(Node newNode)
 
 bool Astar::isValid(Node currNode)
 {
-    if(currNode.x < 0 || currNode.x >= TOTAL_NUMBER_ROWS || currNode.y < 0 || currNode.y >= TOTAL_NUMBER_COLS) 
-    { 
-        return false; 
+    if(currNode.x < 0 || currNode.x >= TOTAL_NUMBER_ROWS || currNode.y < 0 || currNode.y >= TOTAL_NUMBER_COLS)
+    {
+        return false;
     }
     return true;
 }
@@ -91,10 +91,10 @@ void Astar::findPath()
            gridInfo[i][j].h = __FLT_MAX__;
            gridInfo[i][j].parent = new Node;
            int* x = new int;
-           *x = -1; 
+           *x = -1;
            gridInfo[i][j].parent->x = *x;
            gridInfo[i][j].parent->x = *x;
-        }  
+        }
     }
 
     // Initialising the first node with start
@@ -146,7 +146,7 @@ void Astar::findPath()
                         gridInfo[newNode.x][newNode.y].h = h;
                         gridInfo[newNode.x][newNode.y].parent->x = currNode.x;
                         gridInfo[newNode.x][newNode.y].parent->y = currNode.y;
-                        openList.push_back(std::make_pair(f, newNode));  
+                        openList.push_back(std::make_pair(f, newNode));
                     }
                 }
             }
@@ -195,8 +195,8 @@ void Astar::setGoalNode(Node g)
     start.x = 0;
     start.y = 0;
     Node goal;
-    goal.x = 3;
-    goal.y = 3;
+    goal.x = 9;
+    goal.y = 7;
     astarPlan.setStartNode(start);
     astarPlan.setGoalNode(goal);
     astarPlan.findPath();
