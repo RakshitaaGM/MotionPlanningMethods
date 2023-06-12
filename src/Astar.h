@@ -7,8 +7,8 @@
 
 #define TOTAL_NUMBER_COLS 10
 #define TOTAL_NUMBER_ROWS 10
-
-struct Node
+namespace pathPlanning {
+    struct Node
 {
     int x; // x coordinate of the node
     int y; // y coordinate of the node
@@ -33,37 +33,40 @@ class Astar
         Node goal;
         double ncols;
         double nrows;
-        int map[TOTAL_NUMBER_ROWS][TOTAL_NUMBER_COLS] = 
-        {{1, 0, 1, 1, 0, 0, 0, 1, 1, 1},
-         {1, 0, 1, 1, 0, 0, 0, 1, 1, 1},
-         {0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
-         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-         {1, 1, 1, 1, 0, 0, 0, 1, 1, 1},
-         {1, 1, 1, 1, 0, 0, 0, 1, 1, 1},
-         {0, 0, 0, 1, 0, 0, 0, 1, 1, 1},
-         {0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
-         {1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
-         {1, 1, 1, 1, 1, 1, 1, 1, 0, 0}};
+        std::vector<std::vector<int>> m_grid ;
+        // {{1, 0, 1, 1, 0, 0, 0, 1, 1, 1},
+        //  {1, 0, 1, 1, 0, 0, 0, 1, 1, 1},
+        //  {0, 1, 0, 1, 1, 1, 1, 1, 1, 1},
+        //  {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        //  {1, 1, 1, 1, 0, 0, 0, 1, 1, 1},
+        //  {1, 1, 1, 1, 0, 0, 0, 1, 1, 1},
+        //  {0, 0, 0, 1, 0, 0, 0, 1, 1, 1},
+        //  {0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
+        //  {1, 1, 1, 1, 1, 1, 1, 1, 0, 0},
+        //  {1, 1, 1, 1, 1, 1, 1, 1, 0, 0}};
         std::vector<std::pair<double, Node>> openList; // vector<pair(f, Node(x, y))>
         std::vector<std::vector<int>> move = {
         {-1, 1},  {0, 1},   {1, 1},
         {-1, 0},  {0, 0},   {1, 0},
         {-1, -1}, {0, -1}, {1, -1}
         };
-        bool closedList[TOTAL_NUMBER_ROWS][TOTAL_NUMBER_COLS] = {{false}};
+        std::vector<std::vector<bool>> closedList = {{false}};
     
         float calculateHeuristics(Node NewNode);
         bool isValid(Node currNode);
         bool isObstacle(Node currNode);
         bool isGoal(Node currNode);
         
-        void tracePath(Node grid[][TOTAL_NUMBER_COLS]);
+        void tracePath(std::vector<std::vector<Node>> grid);
         std::pair<double, Node> findMinF();
         std::vector<std::pair<int, int>> finalPath;
         // Setters and getters
         void setStartNode(Node s);
-        void setGoalNode(Node goal);
+        void setGoalNode(Node g);
+        void setGrid(std::vector<std::vector<int>>& grid);
         void findPath();
 };
+
+}
 
 #endif 

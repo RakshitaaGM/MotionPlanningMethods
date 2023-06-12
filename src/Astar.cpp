@@ -2,7 +2,9 @@
 #include "Astar.h"
 #include <cmath>
 #include <algorithm>
-float Astar::calculateHeuristics(Node newNode)
+namespace pathPlanning
+{
+    float Astar::calculateHeuristics(Node newNode)
 {
     return sqrt(std::pow((goal.x - newNode.x), 2) + pow((goal.y - newNode.y),2));
 }
@@ -18,7 +20,7 @@ bool Astar::isValid(Node currNode)
 
 bool Astar::isObstacle(Node currNode)
 {
-    if(map[currNode.x][currNode.y] == 0)  return true;
+    if(m_grid[currNode.x][currNode.y] != 0)  return true;
     return false;
 }
 
@@ -28,7 +30,7 @@ bool Astar::isGoal(Node currNode)
     return false;
 }
 
-void Astar::tracePath(Node gridInfo[][TOTAL_NUMBER_COLS])
+void Astar::tracePath(std::vector<std::vector<Node>> gridInfo)
 {
     if(gridInfo[goal.x][goal.y].parent->x == -1 &&  gridInfo[goal.x][goal.y].parent->y == -1)
     {
@@ -40,7 +42,7 @@ void Astar::tracePath(Node gridInfo[][TOTAL_NUMBER_COLS])
     while(!(r == start.x) ||
           !(c == start.y))
     {
-        finalPath.push_back(std::make_pair(r,c));
+        finalPath.emplace_back(std::make_pair(r,c));
         auto t_r = gridInfo[r][c].parent->x;
         auto t_c = gridInfo[r][c].parent->y;
         r = t_r;
@@ -78,11 +80,10 @@ void Astar::findPath()
     {
         std::cout << "Start is already at the goal" << std::endl;
     }
-
-    Node gridInfo[TOTAL_NUMBER_ROWS][TOTAL_NUMBER_COLS];
-    for(int i = 0; i < TOTAL_NUMBER_ROWS; i++)
+    std::vector<std::vector<Node>> gridInfo;
+    for(int i = 0; i < nrows; i++)
     {
-        for(int j = 0; j < TOTAL_NUMBER_COLS; j++)
+        for(int j = 0; j < ncols; j++)
         {
            gridInfo[i][j].x = i;
            gridInfo[i][j].y = j;
@@ -105,7 +106,7 @@ void Astar::findPath()
     gridInfo[start.x][start.y].parent->y = start.y;
 
     //Adding start node to open list
-    openList.push_back(std::make_pair(gridInfo[start.x][start.y].f, start));
+    openList.emplace_back(std::make_pair(gridInfo[start.x][start.y].f, start));
 
     while(!openList.empty())
     {
@@ -146,7 +147,7 @@ void Astar::findPath()
                         gridInfo[newNode.x][newNode.y].h = h;
                         gridInfo[newNode.x][newNode.y].parent->x = currNode.x;
                         gridInfo[newNode.x][newNode.y].parent->y = currNode.y;
-                        openList.push_back(std::make_pair(f, newNode));
+                        openList.emplace_back(std::make_pair(f, newNode));
                     }
                 }
             }
@@ -165,6 +166,13 @@ void Astar::setGoalNode(Node g)
     goal.x = g.x;
     goal.y = g.y;
 }
+
+void Astar::setGrid(std::vector<std::vector<int>>& grid)
+{
+    m_grid = grid;
+}
+}
+
 
 //  std::pair<double, Node> Astar::findMinF()
 //  {
@@ -195,8 +203,8 @@ void Astar::setGoalNode(Node g)
     start.x = 0;
     start.y = 0;
     Node goal;
-    goal.x = 9;
-    goal.y = 7;
+    goal.x = 109;
+    goal.y = 177;
     astarPlan.setStartNode(start);
     astarPlan.setGoalNode(goal);
     astarPlan.findPath();
