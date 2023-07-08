@@ -11,7 +11,7 @@ namespace pathPlanning
 
 bool Astar::isValid(Node currNode)
 {
-    if(currNode.x < 0 || currNode.x >= TOTAL_NUMBER_ROWS || currNode.y < 0 || currNode.y >= TOTAL_NUMBER_COLS)
+    if(currNode.x < 0 || currNode.x >= nrows || currNode.y < 0 || currNode.y >= ncols)
     {
         return false;
     }
@@ -20,7 +20,7 @@ bool Astar::isValid(Node currNode)
 
 bool Astar::isObstacle(Node currNode)
 {
-    if(m_grid[currNode.x][currNode.y] != 0)  return true;
+    if(m_grid[currNode.x][currNode.y] != 100)  return true;
     return false;
 }
 
@@ -72,48 +72,81 @@ void Astar::findPath()
         std::cout << "Start is invalid" << std::endl;
     }
 
-    if(isObstacle(start) || isObstacle(goal))
+    if(isObstacle(start))
     {
-        std::cout << "Start or goal is on the obstacle" << std::endl;
+        std::cout << "Start on the obstacle" << std::endl;
     }
+
+    if(isObstacle(goal))
+    {
+        std::cout << "goal on the obstacle" << std::endl;
+    }
+
     if(isGoal(start))
     {
         std::cout << "Start is already at the goal" << std::endl;
     }
+
     std::vector<std::vector<Node>> gridInfo;
+    gridInfo.reserve(nrows);
+    // std::cout << "<-------gridInfo is created---------------->"<<  std::endl;
     for(int i = 0; i < nrows; i++)
     {
+        std::vector<Node> grid;
+        grid.reserve(ncols);
         for(int j = 0; j < ncols; j++)
         {
-           gridInfo[i][j].x = i;
-           gridInfo[i][j].y = j;
-           gridInfo[i][j].f = __FLT_MAX__;
-           gridInfo[i][j].g = __FLT_MAX__;
-           gridInfo[i][j].h = __FLT_MAX__;
-           gridInfo[i][j].parent = new Node;
+           Node node;
+           node.x = i;
+           node.y = j;
+           node.f = 0.0;
+           node.g = 0.0;
+           node.h = 0.0;
+           node.parent = new Node;
            int* x = new int;
            *x = -1;
-           gridInfo[i][j].parent->x = *x;
-           gridInfo[i][j].parent->x = *x;
+           int* y = new int;
+           *y = -1;
+           node.parent->x = *x;
+           node.parent->y = *y;
+           grid.emplace_back(node);
         }
+        gridInfo.emplace_back(grid);
     }
 
+    // std::cout << "<-------Done with gridInfo init---------------->"<<  std::endl;
     // Initialising the first node with start
     gridInfo[start.x][start.y].f = 0.0;
     gridInfo[start.x][start.y].g = 0.0;
     gridInfo[start.x][start.y].h = 0.0;
     gridInfo[start.x][start.y].parent->x = start.x;
     gridInfo[start.x][start.y].parent->y = start.y;
+    // std::cout << "<-------Done with start assignment ---------------->"<<  std::endl;
 
     //Adding start node to open list
     openList.emplace_back(std::make_pair(gridInfo[start.x][start.y].f, start));
-
+    // std::cout << "<------ Pushed start into open list ---------------->"<<  std::endl;
+    std::vector<std::vector<bool>> closedList;
+    closedList.reserve(nrows);
+    for(uint i = 0; i< nrows; i++)
+    {
+        std::vector<bool> rows;
+        rows.reserve(ncols);
+        for(uint j = 0; j < ncols; j++)
+        {
+            rows.emplace_back(false);
+        }
+        closedList.emplace_back(rows);
+    }
+    // std::cout << "closedList " << closedList.size() << " " << closedList[0].size() << std::endl;
     while(!openList.empty())
     {
         const auto first = openList.begin();
+        // std::cout << "first " << first->first << " " << std::endl;
         openList.erase(openList.begin());
         Node currNode = first->second;
         closedList[first->second.x][first->second.y] = true;
+        // std::cout << "<-----closedList --> "<< closedList[first->second.x][first->second.y] << std::endl;
         for(auto m : move)
         {
             int move_x = m[0];
@@ -122,6 +155,7 @@ void Astar::findPath()
             Node newNode;
             newNode.x = currNode.x + move_x;
             newNode.y = currNode.y + move_y;
+            // std::cout << "<----newNode----> " << newNode.x << " " << newNode.y << std::endl;
             if(isValid(newNode) && !isObstacle(newNode))
             {
                 if(isGoal(newNode))
@@ -136,12 +170,10 @@ void Astar::findPath()
                    float g = gridInfo[newNode.x][newNode.y].g + 1.0;
                    float h = gridInfo[newNode.x][newNode.y].h + calculateHeuristics(newNode);
                    float f = g + h;
-
-                   if(gridInfo[newNode.x][newNode.y].f == __FLT_MAX__ ||
+                    // std::cout << "<------ f: " << f <<  " g : "  << g << " h: " << h << std::endl;
+                   if(gridInfo[newNode.x][newNode.y].f == 0.0 ||
                       gridInfo[newNode.x][newNode.y].f > f)
                     {
-                        // auto n = findMinF();
-                        // std::cout << "Min Node !!!!!!!!!!! " << n.second.x << " " << n.second.y << std::endl;
                         gridInfo[newNode.x][newNode.y].f = f;
                         gridInfo[newNode.x][newNode.y].g = g;
                         gridInfo[newNode.x][newNode.y].h = h;
@@ -196,17 +228,17 @@ void Astar::setGrid(std::vector<std::vector<int>>& grid)
 //     return std::make_pair(minF, minNode);
 //  }
 
- int main()
- {
-    Astar astarPlan;
-    Node start;
-    start.x = 0;
-    start.y = 0;
-    Node goal;
-    goal.x = 109;
-    goal.y = 177;
-    astarPlan.setStartNode(start);
-    astarPlan.setGoalNode(goal);
-    astarPlan.findPath();
-    return 0;
- }
+//  int main()
+//  {
+//     pathPlanning::Astar astarPlan;
+//     pathPlanning::Node start;
+//     start.x = 0;
+//     start.y = 0;
+//     pathPlanning::Node goal;
+//     goal.x = 109;
+//     goal.y = 177;
+//     astarPlan.setStartNode(start);
+//     astarPlan.setGoalNode(goal);
+//     astarPlan.findPath();
+//     return 0;
+//  }

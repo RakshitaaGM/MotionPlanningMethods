@@ -5,8 +5,6 @@
 #ifndef ASTAR_H
 #define ASTAR_H
 
-#define TOTAL_NUMBER_COLS 10
-#define TOTAL_NUMBER_ROWS 10
 namespace pathPlanning {
     struct Node
 {
@@ -29,6 +27,12 @@ namespace pathPlanning {
 class Astar 
 {
     public:
+        Astar(Node m_start, Node m_goal)
+        {
+            start = m_start;
+            goal = m_goal;
+        }
+        Astar() {}
         Node start;
         Node goal;
         double ncols;
@@ -50,7 +54,7 @@ class Astar
         {-1, 0},  {0, 0},   {1, 0},
         {-1, -1}, {0, -1}, {1, -1}
         };
-        std::vector<std::vector<bool>> closedList = {{false}};
+        // std::vector<std::vector<bool>> closedList = {{false}};
     
         float calculateHeuristics(Node NewNode);
         bool isValid(Node currNode);
